@@ -18,7 +18,6 @@ let gameInterval;
 let gameSpeedDelay = 200;
 let gameStarted = false;
 let touchStartX, touchStartY;
-let lastMoveTimestamp = 0;
 
 // Draw game map, snake, food
 function draw() {
@@ -74,22 +73,15 @@ function generateFood() {
 
 // Move the snake
 function move() {
-  const now = Date.now();
-  const timeElapsed = now - lastMoveTimestamp;
+  const head = { ...snake[0] };
+  updateHeadPosition(head);
 
-  if (timeElapsed >= gameSpeedDelay) {
-    const head = { ...snake[0] };
-    updateHeadPosition(head);
+  snake.unshift(head);
 
-    snake.unshift(head);
-
-    if (head.x === food.x && head.y === food.y) {
-      handleFoodCollision();
-    } else {
-      snake.pop();
-    }
-
-    lastMoveTimestamp = now;
+  if (head.x === food.x && head.y === food.y) {
+    handleFoodCollision();
+  } else {
+    snake.pop();
   }
 }
 
@@ -173,21 +165,12 @@ function handleTouchStart(event) {
 
 // Handle touchmove event
 function handleTouchMove(event) {
-  if (gameStarted) {
-    const now = Date.now();
-    const timeElapsed = now - lastMoveTimestamp;
+  const touchEndX = event.touches[0].clientX;
+  const touchEndY = event.touches[0].clientY;
+  const swipeDistanceX = touchEndX - touchStartX;
+  const swipeDistanceY = touchEndY - touchStartY;
 
-    if (timeElapsed >= gameSpeedDelay) {
-      const touchEndX = event.touches[0].clientX;
-      const touchEndY = event.touches[0].clientY;
-      const swipeDistanceX = touchEndX - touchStartX;
-      const swipeDistanceY = touchEndY - touchStartY;
-
-      handleSwipe(swipeDistanceX, swipeDistanceY);
-
-      lastMoveTimestamp = now;
-    }
-  }
+  handleSwipe(swipeDistanceX, swipeDistanceY);
 }
 
 // Handle swipe gestures
@@ -220,7 +203,7 @@ function handleVerticalSwipe(swipeDistanceY) {
 // Increase the game speed
 function increaseSpeed() {
   if (gameSpeedDelay > 25) {
-    gameSpeedDelay -= 5;
+    gameSpeedDelay -= gameSpeedDelay > 150 ? 5 : gameSpeedDelay > 100 ? 3 : gameSpeedDelay > 50 ? 2 : 1;
   }
 }
 
