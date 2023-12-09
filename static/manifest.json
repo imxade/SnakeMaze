@@ -1,0 +1,14 @@
+{
+  "name": "Snake Maze",
+  "short_name": "SnakeMaze",
+  "description": "Nokia green screen snake game",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#000000",
+  "scope": "/",
+  "serviceworker": {
+    "src": "/static/sw.js",
+    "scope": "/"
+  }
+}
