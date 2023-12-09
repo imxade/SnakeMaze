@@ -1,13 +1,15 @@
 // Define HTML elements
 const board = document.getElementById('game-board');
 const instructionText = document.getElementById('instruction-text');
-// const logo = document.getElementById('logo');
-const score = document.getElementById('score');
+const scoreElement = document.getElementById('score');
 const highScoreText = document.getElementById('highScore');
 const link = document.getElementById('extLink');
+// const logo = document.getElementById('logo'); // Commented out logo element
 
-// Define game variables
+// Game variables
 const gridSize = 20;
+const SWIPE_THRESHOLD = 10;
+
 let snake = [{ x: 10, y: 10 }];
 let food = generateFood();
 let highScore = 0;
@@ -16,56 +18,83 @@ let gameInterval;
 let gameSpeedDelay = 200;
 let gameStarted = false;
 let touchStartX, touchStartY;
+let lastMoveTimestamp = 0;
 
 // Draw game map, snake, food
 function draw() {
-  board.innerHTML = '';
+  clearBoard();
   drawSnake();
   drawFood();
   updateScore();
 }
 
-// Draw snake
-function drawSnake() {
-  snake.forEach((segment) => {
-    const snakeElement = createGameElement('div', 'snake');
-    setPosition(snakeElement, segment);
-    board.appendChild(snakeElement);
-  });
+// Clear the game board
+function clearBoard() {
+  board.innerHTML = '';
 }
 
-// Create a snake or food cube/div
+// Draw the snake on the board
+function drawSnake() {
+  snake.forEach(segment => drawElement('snake', segment, 'snake'));
+}
+
+// Create a game element and set its position
+function drawElement(type, position, classLabel) {
+  const element = createGameElement('div', classLabel);
+  setPosition(element, position);
+  board.appendChild(element);
+}
+
+// Create a game element
 function createGameElement(tag, classLabel) {
   const element = document.createElement(tag);
   element.className = classLabel;
   return element;
 }
 
-// Set the position of snake or food
+// Set the position of a game element
 function setPosition(element, position) {
   element.style.gridColumn = position.x;
   element.style.gridRow = position.y;
 }
 
-// Draw food function
+// Draw the food on the board
 function drawFood() {
   if (gameStarted) {
-    const foodElement = createGameElement('div', 'food');
-    setPosition(foodElement, food);
-    board.appendChild(foodElement);
+    drawElement('food', food, 'food');
   }
 }
 
-// Generate food
+// Generate random food position
 function generateFood() {
   const x = Math.floor(Math.random() * gridSize) + 1;
   const y = Math.floor(Math.random() * gridSize) + 1;
   return { x, y };
 }
 
-// Moving the snake
+// Move the snake
 function move() {
-  const head = { ...snake[0] };
+  const now = Date.now();
+  const timeElapsed = now - lastMoveTimestamp;
+
+  if (timeElapsed >= gameSpeedDelay) {
+    const head = { ...snake[0] };
+    updateHeadPosition(head);
+
+    snake.unshift(head);
+
+    if (head.x === food.x && head.y === food.y) {
+      handleFoodCollision();
+    } else {
+      snake.pop();
+    }
+
+    lastMoveTimestamp = now;
+  }
+}
+
+// Update the position of the snake head based on the current direction
+function updateHeadPosition(head) {
   switch (direction) {
     case 'up':
       head.y--;
@@ -80,31 +109,13 @@ function move() {
       head.x++;
       break;
   }
-
-  snake.unshift(head);
-
-  //   snake.pop();
-
-  if (head.x === food.x && head.y === food.y) {
-    food = generateFood();
-    increaseSpeed();
-    clearInterval(gameInterval); // Clear past interval
-    gameInterval = setInterval(() => {
-      move();
-      checkCollision();
-      draw();
-    }, gameSpeedDelay);
-  } else {
-    snake.pop();
-  }
 }
 
-// Start game function
-function startGame() {
-  gameStarted = true; // Keep track of a running game
-  instructionText.style.display = 'none';
-  link.style.display = 'none';
-  // logo.style.display = 'none';
+// Handle collision with food
+function handleFoodCollision() {
+  food = generateFood();
+  increaseSpeed();
+  clearInterval(gameInterval);
   gameInterval = setInterval(() => {
     move();
     checkCollision();
@@ -112,31 +123,46 @@ function startGame() {
   }, gameSpeedDelay);
 }
 
-// Keypress event listener
+// Start the game
+function startGame() {
+  gameStarted = true;
+  instructionText.style.display = 'none';
+  link.style.display = 'none';
+  gameInterval = setInterval(() => {
+    move();
+    checkCollision();
+    draw();
+  }, gameSpeedDelay);
+}
+
+// Handle keypress event
 function handleKeyPress(event) {
-  if (
-    // (!gameStarted && event.code === 'Space') ||
-    (!gameStarted && event.key === ' ')
-  ) {
+  if (!gameStarted && event.key === ' ') {
     startGame();
   } else {
-    switch (event.key) {
-      case 'ArrowUp':
-        direction = 'up';
-        break;
-      case 'ArrowDown':
-        direction = 'down';
-        break;
-      case 'ArrowLeft':
-        direction = 'left';
-        break;
-      case 'ArrowRight':
-        direction = 'right';
-        break;
-    }
+    handleArrowKeys(event);
   }
 }
 
+// Handle arrow key input
+function handleArrowKeys(event) {
+  switch (event.key) {
+    case 'ArrowUp':
+      direction = 'up';
+      break;
+    case 'ArrowDown':
+      direction = 'down';
+      break;
+    case 'ArrowLeft':
+      direction = 'left';
+      break;
+    case 'ArrowRight':
+      direction = 'right';
+      break;
+  }
+}
+
+// Handle touchstart event
 function handleTouchStart(event) {
   if (event.type === 'touchstart') {
     startGame();
@@ -145,45 +171,60 @@ function handleTouchStart(event) {
   }
 }
 
+// Handle touchmove event
 function handleTouchMove(event) {
-  const touchEndX = event.touches[0].clientX;
-  const touchEndY = event.touches[0].clientY;
-  const swipeDistanceX = touchEndX - touchStartX;
-  const swipeDistanceY = touchEndY - touchStartY;
+  if (gameStarted) {
+    const now = Date.now();
+    const timeElapsed = now - lastMoveTimestamp;
+
+    if (timeElapsed >= gameSpeedDelay) {
+      const touchEndX = event.touches[0].clientX;
+      const touchEndY = event.touches[0].clientY;
+      const swipeDistanceX = touchEndX - touchStartX;
+      const swipeDistanceY = touchEndY - touchStartY;
+
+      handleSwipe(swipeDistanceX, swipeDistanceY);
+
+      lastMoveTimestamp = now;
+    }
+  }
+}
+
+// Handle swipe gestures
+function handleSwipe(swipeDistanceX, swipeDistanceY) {
   if (Math.abs(swipeDistanceX) > Math.abs(swipeDistanceY)) {
-    // Horizontal swipe
-    if (swipeDistanceX > 50) {
-      direction = 'right';
-    } else if (swipeDistanceX < -50) {
-      direction = 'left';
-    }
+    handleHorizontalSwipe(swipeDistanceX);
   } else {
-    // Vertical swipe
-    if (swipeDistanceY > 50) {
-      direction = 'down';
-    } else if (swipeDistanceY < -50) {
-      direction = 'up';
-    }
+    handleVerticalSwipe(swipeDistanceY);
   }
 }
 
-document.addEventListener('keydown', handleKeyPress);
-document.addEventListener('touchstart', handleTouchStart, false);
-document.addEventListener('touchmove', handleTouchMove, false);
+// Handle horizontal swipe
+function handleHorizontalSwipe(swipeDistanceX) {
+  if (swipeDistanceX > SWIPE_THRESHOLD) {
+    direction = 'right';
+  } else if (swipeDistanceX < -SWIPE_THRESHOLD) {
+    direction = 'left';
+  }
+}
 
+// Handle vertical swipe
+function handleVerticalSwipe(swipeDistanceY) {
+  if (swipeDistanceY > SWIPE_THRESHOLD) {
+    direction = 'down';
+  } else if (swipeDistanceY < -SWIPE_THRESHOLD) {
+    direction = 'up';
+  }
+}
+
+// Increase the game speed
 function increaseSpeed() {
-  //   console.log(gameSpeedDelay);
-  if (gameSpeedDelay > 150) {
+  if (gameSpeedDelay > 25) {
     gameSpeedDelay -= 5;
-  } else if (gameSpeedDelay > 100) {
-    gameSpeedDelay -= 3;
-  } else if (gameSpeedDelay > 50) {
-    gameSpeedDelay -= 2;
-  } else if (gameSpeedDelay > 25) {
-    gameSpeedDelay -= 1;
   }
 }
 
+// Check for collision with walls or itself
 function checkCollision() {
   const head = snake[0];
 
@@ -198,6 +239,7 @@ function checkCollision() {
   }
 }
 
+// Reset the game state
 function resetGame() {
   updateHighScore();
   stopGame();
@@ -208,19 +250,22 @@ function resetGame() {
   updateScore();
 }
 
+// Update the displayed score
 function updateScore() {
   const currentScore = snake.length - 1;
-  score.textContent = currentScore.toString().padStart(3, '0');
+  scoreElement.textContent = currentScore.toString().padStart(3, '0');
 }
 
+// Stop the game
 function stopGame() {
   clearInterval(gameInterval);
   gameStarted = false;
   instructionText.style.display = 'block';
   link.style.display = 'flex';
-  // logo.style.display = 'block';
+  // logo.style.display = 'block'; // Restore logo display
 }
 
+// Update the high score
 function updateHighScore() {
   const currentScore = snake.length - 1;
   if (currentScore > highScore) {
@@ -229,3 +274,8 @@ function updateHighScore() {
   }
   highScoreText.style.display = 'block';
 }
+
+// Event listeners
+document.addEventListener('keydown', handleKeyPress);
+document.addEventListener('touchstart', handleTouchStart, false);
+document.addEventListener('touchmove', handleTouchMove, false);
