@@ -88,9 +88,13 @@ body,
   position: absolute;
 }
 
-.extLink {
+#extLink {
   padding: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+button {
+  border-radius: 20px;
 }

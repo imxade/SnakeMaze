@@ -4,6 +4,7 @@ const instructionText = document.getElementById('instruction-text');
 // const logo = document.getElementById('logo');
 const score = document.getElementById('score');
 const highScoreText = document.getElementById('highScore');
+const link = document.getElementById('extLink');
 
 // Define game variables
 const gridSize = 20;
@@ -101,6 +102,7 @@ function move() {
 function startGame() {
   gameStarted = true; // Keep track of a running game
   instructionText.style.display = 'none';
+  link.style.display = 'none';
   // logo.style.display = 'none';
   gameInterval = setInterval(() => {
     move();
@@ -181,7 +183,9 @@ function updateScore() {
 function stopGame() {
   clearInterval(gameInterval);
   gameStarted = false;
+  board.innerHTML = '';
   instructionText.style.display = 'block';
+  link.style.display = 'flex';
   // logo.style.display = 'block';
 }
 
