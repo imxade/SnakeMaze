@@ -1,7 +1,7 @@
 // Define HTML elements
 const board = document.getElementById('game-board');
 const instructionText = document.getElementById('instruction-text');
-const logo = document.getElementById('logo');
+// const logo = document.getElementById('logo');
 const score = document.getElementById('score');
 const highScoreText = document.getElementById('highScore');
 
@@ -101,7 +101,7 @@ function move() {
 function startGame() {
   gameStarted = true; // Keep track of a running game
   instructionText.style.display = 'none';
-  logo.style.display = 'none';
+  // logo.style.display = 'none';
   gameInterval = setInterval(() => {
     move();
     checkCollision();
@@ -182,7 +182,7 @@ function stopGame() {
   clearInterval(gameInterval);
   gameStarted = false;
   instructionText.style.display = 'block';
-  logo.style.display = 'block';
+  // logo.style.display = 'block';
 }
 
 function updateHighScore() {
