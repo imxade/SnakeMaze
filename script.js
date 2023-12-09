@@ -183,7 +183,6 @@ function updateScore() {
 function stopGame() {
   clearInterval(gameInterval);
   gameStarted = false;
-  board.innerHTML = '';
   instructionText.style.display = 'block';
   link.style.display = 'flex';
   // logo.style.display = 'block';
