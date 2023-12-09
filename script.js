@@ -15,6 +15,7 @@ let direction = 'right';
 let gameInterval;
 let gameSpeedDelay = 200;
 let gameStarted = false;
+let touchStartX, touchStartY;
 
 // Draw game map, snake, food
 function draw() {
@@ -136,7 +137,39 @@ function handleKeyPress(event) {
   }
 }
 
+function handleTouchStart(event) {
+  if (event.type === 'touchstart') {
+    startGame();
+    touchStartX = event.touches[0].clientX;
+    touchStartY = event.touches[0].clientY;
+  }
+}
+
+function handleTouchMove(event) {
+  const touchEndX = event.touches[0].clientX;
+  const touchEndY = event.touches[0].clientY;
+  const swipeDistanceX = touchEndX - touchStartX;
+  const swipeDistanceY = touchEndY - touchStartY;
+  if (Math.abs(swipeDistanceX) > Math.abs(swipeDistanceY)) {
+    // Horizontal swipe
+    if (swipeDistanceX > 50) {
+      direction = 'right';
+    } else if (swipeDistanceX < -50) {
+      direction = 'left';
+    }
+  } else {
+    // Vertical swipe
+    if (swipeDistanceY > 50) {
+      direction = 'down';
+    } else if (swipeDistanceY < -50) {
+      direction = 'up';
+    }
+  }
+}
+
 document.addEventListener('keydown', handleKeyPress);
+document.addEventListener('touchstart', handleTouchStart, false);
+document.addEventListener('touchmove', handleTouchMove, false);
 
 function increaseSpeed() {
   //   console.log(gameSpeedDelay);
