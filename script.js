@@ -4,7 +4,6 @@ const instructionText = document.getElementById('instruction-text');
 const scoreElement = document.getElementById('score');
 const highScoreText = document.getElementById('highScore');
 const link = document.getElementById('extLink');
-// const logo = document.getElementById('logo'); // Commented out logo element
 
 // Game variables
 const gridSize = 20;
@@ -17,7 +16,8 @@ let direction = 'right';
 let gameInterval;
 let gameSpeedDelay = 200;
 let gameStarted = false;
-let touchStartX, touchStartY;
+let startCoordinate = { x: 0, y: 0 };
+let isDragging = false;
 
 // Draw game map, snake, food
 function draw() {
@@ -129,7 +129,7 @@ function startGame() {
 
 // Handle keypress event
 function handleKeyPress(event) {
-  if (!gameStarted && event.key === ' ') {
+  if (!gameStarted) {
     startGame();
   } else {
     handleArrowKeys(event);
@@ -154,32 +154,44 @@ function handleArrowKeys(event) {
   }
 }
 
-// Handle touchstart event
-function handleTouchStart(event) {
-  if (event.type === 'touchstart') {
-    // Check if the touch event occurred on the game board
-    if (event.target === board) {
-      startGame();
-      touchStartX = event.touches[0].clientX;
-      touchStartY = event.touches[0].clientY;
-    }
+// Handle mouse and touch events
+document.addEventListener('mousedown', handleStart, false);
+document.addEventListener('mousemove', handleMove, false);
+document.addEventListener('mouseup', handleEnd, false);
+document.addEventListener('touchstart', handleStart, false);
+document.addEventListener('touchmove', handleMove, false);
+document.addEventListener('touchend', handleEnd, false);
+
+// Function to handle start of drag/swipe
+function handleStart(event) {
+  // Check if the start event occurred on the game board
+  if (event.target === board) {
+    isDragging = true;
+    startGame();
+    startCoordinate = getEventCoordinates(event);
   }
 }
 
-// Handle touchmove event
-function handleTouchMove(event) {
-  // Check if the touch event occurred on the game board
-  if (event.target === board) {
-    const touchEndX = event.touches[0].clientX;
-    const touchEndY = event.touches[0].clientY;
-    const swipeDistanceX = touchEndX - touchStartX;
-    const swipeDistanceY = touchEndY - touchStartY;
+// Function to handle move during drag/swipe
+function handleMove(event) {
+  if (isDragging) {
+    const currentCoordinate = getEventCoordinates(event);
+    const swipeDistanceX = currentCoordinate.x - startCoordinate.x;
+    const swipeDistanceY = currentCoordinate.y - startCoordinate.y;
 
     handleSwipe(swipeDistanceX, swipeDistanceY);
+
+    // Update start coordinate for the next calculation
+    startCoordinate = currentCoordinate;
   }
 }
 
-// Handle swipe gestures
+// Function to handle end of drag/swipe
+function handleEnd() {
+  isDragging = false;
+}
+
+// Function to handle swipe gestures
 function handleSwipe(swipeDistanceX, swipeDistanceY) {
   if (Math.abs(swipeDistanceX) > Math.abs(swipeDistanceY)) {
     handleHorizontalSwipe(swipeDistanceX);
@@ -188,7 +200,7 @@ function handleSwipe(swipeDistanceX, swipeDistanceY) {
   }
 }
 
-// Handle horizontal swipe
+// Function to handle horizontal swipe
 function handleHorizontalSwipe(swipeDistanceX) {
   if (swipeDistanceX > SWIPE_THRESHOLD) {
     direction = 'right';
@@ -197,7 +209,7 @@ function handleHorizontalSwipe(swipeDistanceX) {
   }
 }
 
-// Handle vertical swipe
+// Function to handle vertical swipe
 function handleVerticalSwipe(swipeDistanceY) {
   if (swipeDistanceY > SWIPE_THRESHOLD) {
     direction = 'down';
@@ -251,7 +263,6 @@ function stopGame() {
   gameStarted = false;
   instructionText.style.display = 'block';
   link.style.display = 'flex';
-  // logo.style.display = 'block'; // Restore logo display
 }
 
 // Update the high score
@@ -264,7 +275,14 @@ function updateHighScore() {
   highScoreText.style.display = 'block';
 }
 
+// Function to get event coordinates (mouse or touch)
+function getEventCoordinates(event) {
+  if (event.touches && event.touches.length) {
+    return { x: event.touches[0].clientX, y: event.touches[0].clientY };
+  } else {
+    return { x: event.clientX, y: event.clientY };
+  }
+}
+
 // Event listeners
 document.addEventListener('keydown', handleKeyPress);
-document.addEventListener('touchstart', handleTouchStart, false);
-document.addEventListener('touchmove', handleTouchMove, false);
