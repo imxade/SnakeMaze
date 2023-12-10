@@ -157,20 +157,26 @@ function handleArrowKeys(event) {
 // Handle touchstart event
 function handleTouchStart(event) {
   if (event.type === 'touchstart') {
-    startGame();
-    touchStartX = event.touches[0].clientX;
-    touchStartY = event.touches[0].clientY;
+    // Check if the touch event occurred on the game board
+    if (event.target === board) {
+      startGame();
+      touchStartX = event.touches[0].clientX;
+      touchStartY = event.touches[0].clientY;
+    }
   }
 }
 
 // Handle touchmove event
 function handleTouchMove(event) {
-  const touchEndX = event.touches[0].clientX;
-  const touchEndY = event.touches[0].clientY;
-  const swipeDistanceX = touchEndX - touchStartX;
-  const swipeDistanceY = touchEndY - touchStartY;
+  // Check if the touch event occurred on the game board
+  if (event.target === board) {
+    const touchEndX = event.touches[0].clientX;
+    const touchEndY = event.touches[0].clientY;
+    const swipeDistanceX = touchEndX - touchStartX;
+    const swipeDistanceY = touchEndY - touchStartY;
 
-  handleSwipe(swipeDistanceX, swipeDistanceY);
+    handleSwipe(swipeDistanceX, swipeDistanceY);
+  }
 }
 
 // Handle swipe gestures
