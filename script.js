@@ -160,7 +160,12 @@ function updateHighScore() {
   highScoreText.style.display = 'block';
 }
 
-// Event listener for both keydown and mousedown
+// Variables to track mouse position during dragging
+let isDragging = false;
+let dragStartX = 0;
+let dragStartY = 0;
+
+// Event listener for both keydown, mousedown, and mousemove
 function handleInput(event) {
   if (!gameStarted) {
     if (
@@ -170,18 +175,43 @@ function handleInput(event) {
       startGame();
     }
   } else {
-    switch (event.key) {
-      case 'ArrowUp':
-        direction = 'up';
+    switch (event.type) {
+      case 'keydown':
+        switch (event.key) {
+          case 'ArrowUp':
+            direction = 'up';
+            break;
+          case 'ArrowDown':
+            direction = 'down';
+            break;
+          case 'ArrowLeft':
+            direction = 'left';
+            break;
+          case 'ArrowRight':
+            direction = 'right';
+            break;
+        }
         break;
-      case 'ArrowDown':
-        direction = 'down';
+      case 'mousedown':
+        if (isClickInsideBoard(event)) {
+          isDragging = true;
+          dragStartX = event.clientX;
+          dragStartY = event.clientY;
+        }
         break;
-      case 'ArrowLeft':
-        direction = 'left';
+      case 'mousemove':
+        if (isDragging) {
+          const deltaX = event.clientX - dragStartX;
+          const deltaY = event.clientY - dragStartY;
+          if (Math.abs(deltaX) > Math.abs(deltaY)) {
+            direction = deltaX > 0 ? 'right' : 'left';
+          } else {
+            direction = deltaY > 0 ? 'down' : 'up';
+          }
+        }
         break;
-      case 'ArrowRight':
-        direction = 'right';
+      case 'mouseup':
+        isDragging = false;
         break;
     }
   }
@@ -196,4 +226,6 @@ function isClickInsideBoard(event) {
 
 document.addEventListener('keydown', handleInput);
 document.addEventListener('mousedown', handleInput);
+document.addEventListener('mousemove', handleInput);
+document.addEventListener('mouseup', handleInput);
 
