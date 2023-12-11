@@ -182,42 +182,6 @@ let isDragging = false;
 let dragStartX = 0;
 let dragStartY = 0;
 
-// Event listener for pointerdown, pointermove, and pointerup
-function handleInput(event) {
-  if (
-    !gameStarted &&
-    ((event.type === "pointerdown" && isClickInsideBoard(event)) ||
-      (event.type === "keydown" && event.key === " "))
-  ) {
-    startGame();
-  } else if (gameStarted) {
-    switch (event.type) {
-      case "keydown":
-        const newDirection = getDirectionFromKey(event.key);
-        if (isOppositeDirection(newDirection, direction)) {
-          // Ignore opposite direction
-          return;
-        }
-        direction = newDirection;
-        break;
-      case "pointerdown":
-        if (isClickInsideBoard(event)) {
-          isDragging = true;
-          setDragStart(event);
-        }
-        break;
-      case "pointermove":
-        if (isDragging) {
-          setDirectionFromDrag(event);
-        }
-        break;
-      case "pointerup":
-        isDragging = false;
-        break;
-    }
-  }
-}
-
 function getDirectionFromKey(key) {
   switch (key) {
     case "ArrowUp":
@@ -238,24 +202,60 @@ function setDragStart(event) {
   dragStartY = event.clientY;
 }
 
-function setDirectionFromDrag(event) {
-  const deltaX = event.clientX - dragStartX;
-  const deltaY = event.clientY - dragStartY;
-  direction =
-    Math.abs(deltaX) > Math.abs(deltaY)
-      ? deltaX > 0
-        ? "right"
-        : "left"
-      : deltaY > 0
-        ? "down"
-        : "up";
-}
-
 function isClickInsideBoard(event) {
   const rect = board.getBoundingClientRect();
   const x = event.clientX - rect.left;
   const y = event.clientY - rect.top;
   return x >= 0 && x <= rect.width && y >= 0 && y <= rect.height;
+}
+
+function setDirectionFromDrag(event) {
+  const deltaX = event.clientX - dragStartX;
+  const deltaY = event.clientY - dragStartY;
+  return Math.abs(deltaX) > Math.abs(deltaY)
+    ? deltaX > 0
+      ? "right"
+      : "left"
+    : deltaY > 0
+    ? "down"
+    : "up";
+}
+
+// Event listener for pointerdown, pointermove, and pointerup
+function handleInput(event) {
+  let newDirection;
+  if (
+    !gameStarted &&
+    ((event.type === "pointerdown" && isClickInsideBoard(event)) ||
+      (event.type === "keydown" && event.key === " "))
+  ) {
+    startGame();
+  } else if (gameStarted) {
+    switch (event.type) {
+      case "keydown":
+        newDirection = getDirectionFromKey(event.key);
+        break;
+      case "pointerdown":
+        if (isClickInsideBoard(event)) {
+          isDragging = true;
+          setDragStart(event);
+        }
+        break;
+      case "pointermove":
+        if (isDragging) {
+          newDirection = setDirectionFromDrag(event);
+        }
+        break;
+      case "pointerup":
+        isDragging = false;
+        break;
+    }
+    if (newDirection !== undefined && !isOppositeDirection(newDirection, direction)) {
+      // Ignore opposite direction
+      direction = newDirection;
+      return;
+    }
+  }
 }
 
 document.addEventListener("keydown", handleInput);
