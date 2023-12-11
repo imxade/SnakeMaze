@@ -19,3 +19,4 @@ self.addEventListener('fetch', function(event) {
   );
 });
 
+console.log('121223');
