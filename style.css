@@ -41,9 +41,8 @@ body,
 
 #instruction-text {
   position: absolute;
-  // top: 64%;
   color: #333;
-  width: 26%;
+  width: 100px;
   text-align: center;
   text-transform: capitalize;
   padding: 30px;
