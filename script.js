@@ -1,23 +1,23 @@
 // Define HTML elements
-const board = document.getElementById('game-board');
-const instructionText = document.getElementById('instruction-text');
-const score = document.getElementById('score');
-const highScoreText = document.getElementById('highScore');
-const link = document.getElementById('extLink');
+const board = document.getElementById("game-board");
+const instructionText = document.getElementById("instruction-text");
+const score = document.getElementById("score");
+const highScoreText = document.getElementById("highScore");
+const link = document.getElementById("extLink");
 
 // Define game variables
 const gridSize = 20;
 let snake = [{ x: 10, y: 10 }];
 let food = generateFood();
 let highScore = 0;
-let direction = 'right';
+let direction = "right";
 let gameInterval;
 let gameSpeedDelay = 200;
 let gameStarted = false;
 
 // Draw game map, snake, food
 function draw() {
-  board.textContent = '';
+  board.textContent = "";
   drawSnake();
   drawFood();
   updateScore();
@@ -26,7 +26,7 @@ function draw() {
 // Draw snake
 function drawSnake() {
   snake.forEach((segment) => {
-    const snakeElement = createGameElement('div', 'snake');
+    const snakeElement = createGameElement("div", "snake");
     setPosition(snakeElement, segment);
     board.appendChild(snakeElement);
   });
@@ -51,7 +51,7 @@ function setPosition(element, position) {
 // Draw food function
 function drawFood() {
   if (gameStarted) {
-    const foodElement = createGameElement('div', 'food');
+    const foodElement = createGameElement("div", "food");
     setPosition(foodElement, food);
     board.appendChild(foodElement);
   }
@@ -68,16 +68,16 @@ function generateFood() {
 function move() {
   const head = { ...snake[0] };
   switch (direction) {
-    case 'up':
+    case "up":
       head.y--;
       break;
-    case 'down':
+    case "down":
       head.y++;
       break;
-    case 'left':
+    case "left":
       head.x--;
       break;
-    case 'right':
+    case "right":
       head.x++;
       break;
   }
@@ -101,17 +101,24 @@ function move() {
 // Start game function
 function startGame() {
   gameStarted = true; // Keep track of a running game
-  instructionText.style.display = 'none';
+  instructionText.style.display = "none";
   gameInterval = setInterval(() => {
     move();
     checkCollision();
     draw();
-  }, gameSpeedDelay); 
+  }, gameSpeedDelay);
 }
 
 function increaseSpeed() {
   if (gameSpeedDelay > 25) {
-    gameSpeedDelay -= gameSpeedDelay > 150 ? 5 : gameSpeedDelay > 100 ? 3 : gameSpeedDelay > 50 ? 2 : 1;
+    gameSpeedDelay -=
+      gameSpeedDelay > 150
+        ? 5
+        : gameSpeedDelay > 100
+          ? 3
+          : gameSpeedDelay > 50
+            ? 2
+            : 1;
   }
 }
 
@@ -134,37 +141,39 @@ function resetGame() {
   stopGame();
   snake = [{ x: 10, y: 10 }];
   food = generateFood();
-  direction = 'right';
+  direction = "right";
   gameSpeedDelay = 200;
   updateScore();
 }
 
 function updateScore() {
   const currentScore = snake.length - 1;
-  score.textContent = currentScore.toString().padStart(3, '0');
+  score.textContent = currentScore.toString().padStart(3, "0");
 }
 
 function stopGame() {
   clearInterval(gameInterval);
   gameStarted = false;
-  instructionText.style.display = 'block';
-  extLink.style.display = 'block';
+  instructionText.style.display = "block";
+  extLink.style.display = "block";
 }
 
 function updateHighScore() {
   const currentScore = snake.length - 1;
   if (currentScore > highScore) {
     highScore = currentScore;
-    highScoreText.textContent = highScore.toString().padStart(3, '0');
+    highScoreText.textContent = highScore.toString().padStart(3, "0");
   }
-  highScoreText.style.display = 'block';
+  highScoreText.style.display = "block";
 }
 
 function isOppositeDirection(dir1, dir2) {
-  return (dir1 === 'up' && dir2 === 'down') ||
-         (dir1 === 'down' && dir2 === 'up') ||
-         (dir1 === 'left' && dir2 === 'right') ||
-         (dir1 === 'right' && dir2 === 'left');
+  return (
+    (dir1 === "up" && dir2 === "down") ||
+    (dir1 === "down" && dir2 === "up") ||
+    (dir1 === "left" && dir2 === "right") ||
+    (dir1 === "right" && dir2 === "left")
+  );
 }
 
 // Variables to track input during dragging
@@ -174,11 +183,15 @@ let dragStartY = 0;
 
 // Event listener for pointerdown, pointermove, and pointerup
 function handleInput(event) {
-  if (!gameStarted && ((event.type === 'pointerdown' && isClickInsideBoard(event)) || (event.type === 'keydown' && event.key === ' '))) {
+  if (
+    !gameStarted &&
+    ((event.type === "pointerdown" && isClickInsideBoard(event)) ||
+      (event.type === "keydown" && event.key === " "))
+  ) {
     startGame();
   } else if (gameStarted) {
     switch (event.type) {
-      case 'keydown':
+      case "keydown":
         const newDirection = getDirectionFromKey(event.key);
         if (isOppositeDirection(newDirection, direction)) {
           // Ignore opposite direction
@@ -186,18 +199,18 @@ function handleInput(event) {
         }
         direction = newDirection;
         break;
-      case 'pointerdown':
+      case "pointerdown":
         if (isClickInsideBoard(event)) {
           isDragging = true;
           setDragStart(event);
         }
         break;
-      case 'pointermove':
+      case "pointermove":
         if (isDragging) {
           setDirectionFromDrag(event);
         }
         break;
-      case 'pointerup':
+      case "pointerup":
         isDragging = false;
         break;
     }
@@ -206,14 +219,14 @@ function handleInput(event) {
 
 function getDirectionFromKey(key) {
   switch (key) {
-    case 'ArrowUp':
-      return 'up';
-    case 'ArrowDown':
-      return 'down';
-    case 'ArrowLeft':
-      return 'left';
-    case 'ArrowRight':
-      return 'right';
+    case "ArrowUp":
+      return "up";
+    case "ArrowDown":
+      return "down";
+    case "ArrowLeft":
+      return "left";
+    case "ArrowRight":
+      return "right";
     default:
       return direction;
   }
@@ -227,7 +240,14 @@ function setDragStart(event) {
 function setDirectionFromDrag(event) {
   const deltaX = event.clientX - dragStartX;
   const deltaY = event.clientY - dragStartY;
-  direction = Math.abs(deltaX) > Math.abs(deltaY) ? (deltaX > 0 ? 'right' : 'left') : (deltaY > 0 ? 'down' : 'up');
+  direction =
+    Math.abs(deltaX) > Math.abs(deltaY)
+      ? deltaX > 0
+        ? "right"
+        : "left"
+      : deltaY > 0
+        ? "down"
+        : "up";
 }
 
 function isClickInsideBoard(event) {
@@ -237,7 +257,7 @@ function isClickInsideBoard(event) {
   return x >= 0 && x <= rect.width && y >= 0 && y <= rect.height;
 }
 
-document.addEventListener('keydown', handleInput);
-document.addEventListener('pointerdown', handleInput);
-document.addEventListener('pointermove', handleInput);
-document.addEventListener('pointerup', handleInput);
+document.addEventListener("keydown", handleInput);
+document.addEventListener("pointerdown", handleInput);
+document.addEventListener("pointermove", handleInput);
+document.addEventListener("pointerup", handleInput);
