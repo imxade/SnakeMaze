@@ -6,6 +6,8 @@ self.addEventListener('install', function(event) {
         '/index.html',  
         '/script.js',
         '/style.css',
+        '/static/manifest.json'
+        '/static/service-worker.js'
       ]);
     })
   );
@@ -19,4 +21,3 @@ self.addEventListener('fetch', function(event) {
   );
 });
 
-console.log('121223');
