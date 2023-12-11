@@ -160,6 +160,13 @@ function updateHighScore() {
   highScoreText.style.display = 'block';
 }
 
+function isOppositeDirection(dir1, dir2) {
+  return (dir1 === 'up' && dir2 === 'down') ||
+         (dir1 === 'down' && dir2 === 'up') ||
+         (dir1 === 'left' && dir2 === 'right') ||
+         (dir1 === 'right' && dir2 === 'left');
+}
+
 // Variables to track input during dragging
 let isDragging = false;
 let dragStartX = 0;
@@ -172,7 +179,12 @@ function handleInput(event) {
   } else if (gameStarted) {
     switch (event.type) {
       case 'keydown':
-        direction = getDirectionFromKey(event.key);
+        const newDirection = getDirectionFromKey(event.key);
+        if (isOppositeDirection(newDirection, direction)) {
+          // Ignore opposite direction
+          return;
+        }
+        direction = newDirection;
         break;
       case 'pointerdown':
         if (isClickInsideBoard(event)) {
