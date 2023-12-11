@@ -45,9 +45,6 @@ function setPosition(element, position) {
   element.style.gridRow = position.y;
 }
 
-// Testing draw function
-// draw();
-
 // Draw food function
 function drawFood() {
   if (gameStarted) {
