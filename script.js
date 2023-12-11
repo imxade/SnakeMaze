@@ -109,33 +109,6 @@ function startGame() {
   }, gameSpeedDelay); 
 }
 
-// Keypress event listener
-function handleKeyPress(event) {
-  if (
-    (!gameStarted && event.code === 'Space') ||
-    (!gameStarted && event.key === ' ')
-  ) {
-    startGame();
-  } else {
-    switch (event.key) {
-      case 'ArrowUp':
-        direction = 'up';
-        break;
-      case 'ArrowDown':
-        direction = 'down';
-        break;
-      case 'ArrowLeft':
-        direction = 'left';
-        break;
-      case 'ArrowRight':
-        direction = 'right';
-        break;
-    }
-  }
-}
-
-document.addEventListener('keydown', handleKeyPress);
-
 function increaseSpeed() {
   if (gameSpeedDelay > 25) {
     gameSpeedDelay -= gameSpeedDelay > 150 ? 5 : gameSpeedDelay > 100 ? 3 : gameSpeedDelay > 50 ? 2 : 1;
@@ -186,3 +159,41 @@ function updateHighScore() {
   }
   highScoreText.style.display = 'block';
 }
+
+// Event listener for both keydown and mousedown
+function handleInput(event) {
+  if (!gameStarted) {
+    if (
+      (event.code === 'Space' || event.key === ' ') ||
+      (event.type === 'mousedown' && isClickInsideBoard(event))
+    ) {
+      startGame();
+    }
+  } else {
+    switch (event.key) {
+      case 'ArrowUp':
+        direction = 'up';
+        break;
+      case 'ArrowDown':
+        direction = 'down';
+        break;
+      case 'ArrowLeft':
+        direction = 'left';
+        break;
+      case 'ArrowRight':
+        direction = 'right';
+        break;
+    }
+  }
+}
+
+function isClickInsideBoard(event) {
+  const rect = board.getBoundingClientRect();
+  const x = event.clientX - rect.left;
+  const y = event.clientY - rect.top;
+  return x >= 0 && x <= rect.width && y >= 0 && y <= rect.height;
+}
+
+document.addEventListener('keydown', handleInput);
+document.addEventListener('mousedown', handleInput);
+
