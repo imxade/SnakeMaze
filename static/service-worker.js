@@ -1,7 +1,7 @@
 self.addEventListener('install', function(event) {
   self.skipWaiting(); // Skip waiting and activate immediately
   event.waitUntil(
-    caches.open('snake-maze').then(function(cache) {
+    caches.open('Cache').then(function(cache) {
       return cache.addAll([
         '/',
         '/index.html',  
