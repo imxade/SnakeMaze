@@ -42,7 +42,7 @@ body,
 #instruction-text {
   position: absolute;
   color: #333;
-  width: 100px;
+  width: 300px;
   text-align: center;
   text-transform: capitalize;
   padding: 30px;
