@@ -159,18 +159,17 @@ function updateHighScore() {
   }
   highScoreText.style.display = 'block';
 }
-
-// Variables to track mouse position during dragging
+// Variables to track input during dragging
 let isDragging = false;
 let dragStartX = 0;
 let dragStartY = 0;
 
-// Event listener for both keydown, mousedown, and mousemove
+// Event listener for pointerdown, pointermove, and pointerup
 function handleInput(event) {
   if (!gameStarted) {
     if (
-      (event.code === 'Space' || event.key === ' ') ||
-      (event.type === 'mousedown' && isClickInsideBoard(event))
+      (event.type === 'pointerdown' && isClickInsideBoard(event)) ||
+      (event.type === 'keydown' && (event.code === 'Space' || event.key === ' '))
     ) {
       startGame();
     }
@@ -192,14 +191,14 @@ function handleInput(event) {
             break;
         }
         break;
-      case 'mousedown':
+      case 'pointerdown':
         if (isClickInsideBoard(event)) {
           isDragging = true;
           dragStartX = event.clientX;
           dragStartY = event.clientY;
         }
         break;
-      case 'mousemove':
+      case 'pointermove':
         if (isDragging) {
           const deltaX = event.clientX - dragStartX;
           const deltaY = event.clientY - dragStartY;
@@ -210,7 +209,7 @@ function handleInput(event) {
           }
         }
         break;
-      case 'mouseup':
+      case 'pointerup':
         isDragging = false;
         break;
     }
@@ -225,7 +224,7 @@ function isClickInsideBoard(event) {
 }
 
 document.addEventListener('keydown', handleInput);
-document.addEventListener('mousedown', handleInput);
-document.addEventListener('mousemove', handleInput);
-document.addEventListener('mouseup', handleInput);
+document.addEventListener('pointerdown', handleInput);
+document.addEventListener('pointermove', handleInput);
+document.addEventListener('pointerup', handleInput);
 
