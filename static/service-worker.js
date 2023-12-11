@@ -23,8 +23,6 @@ self.addEventListener('fetch', function(event) {
   );
 });
 
-// service-worker.js
-
 let deferredInstallPrompt = null;
 
 self.addEventListener('beforeinstallprompt', (event) => {
@@ -37,7 +35,6 @@ self.addEventListener('beforeinstallprompt', (event) => {
   // Optionally, you can customize the UI or behavior here
 });
 
-// Listen for a custom event to trigger the installation prompt
 self.addEventListener('message', (event) => {
   if (event.data && event.data.action === 'installApp' && deferredInstallPrompt) {
     // Show the installation prompt
