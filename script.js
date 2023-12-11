@@ -159,6 +159,7 @@ function updateHighScore() {
   }
   highScoreText.style.display = 'block';
 }
+
 // Variables to track input during dragging
 let isDragging = false;
 let dragStartX = 0;
@@ -166,47 +167,22 @@ let dragStartY = 0;
 
 // Event listener for pointerdown, pointermove, and pointerup
 function handleInput(event) {
-  if (!gameStarted) {
-    if (
-      (event.type === 'pointerdown' && isClickInsideBoard(event)) ||
-      (event.type === 'keydown' && (event.code === 'Space' || event.key === ' '))
-    ) {
-      startGame();
-    }
-  } else {
+  if (!gameStarted && ((event.type === 'pointerdown' && isClickInsideBoard(event)) || (event.type === 'keydown' && event.key === ' '))) {
+    startGame();
+  } else if (gameStarted) {
     switch (event.type) {
       case 'keydown':
-        switch (event.key) {
-          case 'ArrowUp':
-            direction = 'up';
-            break;
-          case 'ArrowDown':
-            direction = 'down';
-            break;
-          case 'ArrowLeft':
-            direction = 'left';
-            break;
-          case 'ArrowRight':
-            direction = 'right';
-            break;
-        }
+        direction = getDirectionFromKey(event.key);
         break;
       case 'pointerdown':
         if (isClickInsideBoard(event)) {
           isDragging = true;
-          dragStartX = event.clientX;
-          dragStartY = event.clientY;
+          setDragStart(event);
         }
         break;
       case 'pointermove':
         if (isDragging) {
-          const deltaX = event.clientX - dragStartX;
-          const deltaY = event.clientY - dragStartY;
-          if (Math.abs(deltaX) > Math.abs(deltaY)) {
-            direction = deltaX > 0 ? 'right' : 'left';
-          } else {
-            direction = deltaY > 0 ? 'down' : 'up';
-          }
+          setDirectionFromDrag(event);
         }
         break;
       case 'pointerup':
@@ -214,6 +190,32 @@ function handleInput(event) {
         break;
     }
   }
+}
+
+function getDirectionFromKey(key) {
+  switch (key) {
+    case 'ArrowUp':
+      return 'up';
+    case 'ArrowDown':
+      return 'down';
+    case 'ArrowLeft':
+      return 'left';
+    case 'ArrowRight':
+      return 'right';
+    default:
+      return direction;
+  }
+}
+
+function setDragStart(event) {
+  dragStartX = event.clientX;
+  dragStartY = event.clientY;
+}
+
+function setDirectionFromDrag(event) {
+  const deltaX = event.clientX - dragStartX;
+  const deltaY = event.clientY - dragStartY;
+  direction = Math.abs(deltaX) > Math.abs(deltaY) ? (deltaX > 0 ? 'right' : 'left') : (deltaY > 0 ? 'down' : 'up');
 }
 
 function isClickInsideBoard(event) {
@@ -227,4 +229,3 @@ document.addEventListener('keydown', handleInput);
 document.addEventListener('pointerdown', handleInput);
 document.addEventListener('pointermove', handleInput);
 document.addEventListener('pointerup', handleInput);
-
