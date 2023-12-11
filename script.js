@@ -102,6 +102,7 @@ function move() {
 function startGame() {
   gameStarted = true; // Keep track of a running game
   instructionText.style.display = "none";
+  link.style.display = "none";
   gameInterval = setInterval(() => {
     move();
     checkCollision();
@@ -155,7 +156,7 @@ function stopGame() {
   clearInterval(gameInterval);
   gameStarted = false;
   instructionText.style.display = "block";
-  extLink.style.display = "block";
+  link.style.display = "block";
 }
 
 function updateHighScore() {

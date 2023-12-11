@@ -1,23 +1,34 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
+    <meta
+      name="viewport"
+      content="width=device-width,
+      maximum-scale=0.9,user-scalable=0"
+    />
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Snake Maze</title>
-    <link rel="manifest" href='/static/manifest.json'>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css">
+    <link rel="manifest" href="/static/manifest.json" />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css"
+    />
     <link rel="stylesheet" href="style.css" />
     <script src="script.js" defer></script>
     <script>
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('service-worker.js')
-                .then((registration) => {
-                    console.log('Service Worker registered with scope:', registration.scope);
-                })
-                .catch((error) => {
-                    console.error('Service Worker registration failed:', error);
-                });
-        }
+      if ("serviceWorker" in navigator) {
+        navigator.serviceWorker
+          .register("service-worker.js")
+          .then((registration) => {
+            console.log(
+              "Service Worker registered with scope:",
+              registration.scope,
+            );
+          })
+          .catch((error) => {
+            console.error("Service Worker registration failed:", error);
+          });
+      }
     </script>
   </head>
   <body>
@@ -33,7 +44,9 @@
           </div>
         </div>
       </div>
-        <a id="extLink" href="https://codeberg.org/zz/SnakeMaze" target=_><button>Source</button></a>
+      <a id="extLink" href="https://codeberg.org/zz/SnakeMaze" target="_"
+        ><button>Source</button></a
+      >
     </div>
     <h1 id="instruction-text">click to start</h1>
   </body>
