@@ -6,8 +6,8 @@ self.addEventListener('install', function(event) {
         '/index.html',  
         '/script.js',
         '/style.css',
-        '/static/manifest.json'
-        '/static/service-worker.js'
+        '/static/manifest.json',
+        '/static/service-worker.js',
       ]);
     })
   );
