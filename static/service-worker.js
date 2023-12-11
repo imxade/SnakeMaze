@@ -4,7 +4,9 @@ self.addEventListener('install', function(event) {
     caches.open('student-panel').then(function(cache) {
       return cache.addAll([
         '/',
-        // Add other URLs that you want to cache for offline access
+        '/index.html',  
+        '/script.js',
+        '/style.css',
       ]);
     })
   );
