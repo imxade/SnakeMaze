@@ -1,14 +1,12 @@
 // Define HTML elements
 const board = document.getElementById('game-board');
 const instructionText = document.getElementById('instruction-text');
-const scoreElement = document.getElementById('score');
+const score = document.getElementById('score');
 const highScoreText = document.getElementById('highScore');
 const link = document.getElementById('extLink');
 
-// Game variables
+// Define game variables
 const gridSize = 20;
-const SWIPE_THRESHOLD = 10;
-
 let snake = [{ x: 10, y: 10 }];
 let food = generateFood();
 let highScore = 0;
@@ -16,77 +14,59 @@ let direction = 'right';
 let gameInterval;
 let gameSpeedDelay = 200;
 let gameStarted = false;
-let startCoordinate = { x: 0, y: 0 };
-let isDragging = false;
 
 // Draw game map, snake, food
 function draw() {
-  clearBoard();
+  board.textContent = '';
   drawSnake();
   drawFood();
   updateScore();
 }
 
-// Clear the game board
-function clearBoard() {
-  board.innerHTML = '';
-}
-
-// Draw the snake on the board
+// Draw snake
 function drawSnake() {
-  snake.forEach(segment => drawElement('snake', segment, 'snake'));
+  snake.forEach((segment) => {
+    const snakeElement = createGameElement('div', 'snake');
+    setPosition(snakeElement, segment);
+    board.appendChild(snakeElement);
+  });
 }
 
-// Create a game element and set its position
-function drawElement(type, position, classLabel) {
-  const element = createGameElement('div', classLabel);
-  setPosition(element, position);
-  board.appendChild(element);
-}
-
-// Create a game element
-function createGameElement(tag, classLabel) {
+// Create a snake or food cube/div
+function createGameElement(tag, className) {
   const element = document.createElement(tag);
-  element.className = classLabel;
+  element.classList.add(className);
   return element;
 }
 
-// Set the position of a game element
+// Set the position of snake or food
 function setPosition(element, position) {
   element.style.gridColumn = position.x;
   element.style.gridRow = position.y;
 }
 
-// Draw the food on the board
+// Testing draw function
+// draw();
+
+// Draw food function
 function drawFood() {
   if (gameStarted) {
-    drawElement('food', food, 'food');
+    const foodElement = createGameElement('div', 'food');
+    setPosition(foodElement, food);
+    board.appendChild(foodElement);
   }
 }
 
-// Generate random food position
+// Generate food
 function generateFood() {
   const x = Math.floor(Math.random() * gridSize) + 1;
   const y = Math.floor(Math.random() * gridSize) + 1;
   return { x, y };
 }
 
-// Move the snake
+// Moving the snake
 function move() {
   const head = { ...snake[0] };
-  updateHeadPosition(head);
-
-  snake.unshift(head);
-
-  if (head.x === food.x && head.y === food.y) {
-    handleFoodCollision();
-  } else {
-    snake.pop();
-  }
-}
-
-// Update the position of the snake head based on the current direction
-function updateHeadPosition(head) {
   switch (direction) {
     case 'up':
       head.y--;
@@ -101,131 +81,67 @@ function updateHeadPosition(head) {
       head.x++;
       break;
   }
+
+  snake.unshift(head);
+
+  if (head.x === food.x && head.y === food.y) {
+    food = generateFood();
+    increaseSpeed();
+    clearInterval(gameInterval); // Clear past interval
+    gameInterval = setInterval(() => {
+      move();
+      checkCollision();
+      draw();
+    }, gameSpeedDelay);
+  } else {
+    snake.pop();
+  }
 }
 
-// Handle collision with food
-function handleFoodCollision() {
-  food = generateFood();
-  increaseSpeed();
-  clearInterval(gameInterval);
-  gameInterval = setInterval(() => {
-    move();
-    checkCollision();
-    draw();
-  }, gameSpeedDelay);
-}
-
-// Start the game
+// Start game function
 function startGame() {
-  gameStarted = true;
+  gameStarted = true; // Keep track of a running game
   instructionText.style.display = 'none';
-  link.style.display = 'none';
   gameInterval = setInterval(() => {
     move();
     checkCollision();
     draw();
-  }, gameSpeedDelay);
+  }, gameSpeedDelay); 
 }
 
-// Handle keypress event
+// Keypress event listener
 function handleKeyPress(event) {
-  if (!gameStarted) {
+  if (
+    (!gameStarted && event.code === 'Space') ||
+    (!gameStarted && event.key === ' ')
+  ) {
     startGame();
   } else {
-    handleArrowKeys(event);
+    switch (event.key) {
+      case 'ArrowUp':
+        direction = 'up';
+        break;
+      case 'ArrowDown':
+        direction = 'down';
+        break;
+      case 'ArrowLeft':
+        direction = 'left';
+        break;
+      case 'ArrowRight':
+        direction = 'right';
+        break;
+    }
   }
 }
 
-// Handle arrow key input
-function handleArrowKeys(event) {
-  switch (event.key) {
-    case 'ArrowUp':
-      direction = 'up';
-      break;
-    case 'ArrowDown':
-      direction = 'down';
-      break;
-    case 'ArrowLeft':
-      direction = 'left';
-      break;
-    case 'ArrowRight':
-      direction = 'right';
-      break;
-  }
-}
+document.addEventListener('keydown', handleKeyPress);
 
-// Handle mouse and touch events
-document.addEventListener('mousedown', handleStart, false);
-document.addEventListener('mousemove', handleMove, false);
-document.addEventListener('mouseup', handleEnd, false);
-document.addEventListener('touchstart', handleStart, false);
-document.addEventListener('touchmove', handleMove, false);
-document.addEventListener('touchend', handleEnd, false);
-
-// Function to handle start of drag/swipe
-function handleStart(event) {
-  // Check if the start event occurred on the game board
-  if (event.target === board) {
-    isDragging = true;
-    startGame();
-    startCoordinate = getEventCoordinates(event);
-  }
-}
-
-// Function to handle move during drag/swipe
-function handleMove(event) {
-  if (isDragging) {
-    const currentCoordinate = getEventCoordinates(event);
-    const swipeDistanceX = currentCoordinate.x - startCoordinate.x;
-    const swipeDistanceY = currentCoordinate.y - startCoordinate.y;
-
-    handleSwipe(swipeDistanceX, swipeDistanceY);
-
-    // Update start coordinate for the next calculation
-    startCoordinate = currentCoordinate;
-  }
-}
-
-// Function to handle end of drag/swipe
-function handleEnd() {
-  isDragging = false;
-}
-
-// Function to handle swipe gestures
-function handleSwipe(swipeDistanceX, swipeDistanceY) {
-  if (Math.abs(swipeDistanceX) > Math.abs(swipeDistanceY)) {
-    handleHorizontalSwipe(swipeDistanceX);
-  } else {
-    handleVerticalSwipe(swipeDistanceY);
-  }
-}
-
-// Function to handle horizontal swipe
-function handleHorizontalSwipe(swipeDistanceX) {
-  if (swipeDistanceX > SWIPE_THRESHOLD) {
-    direction = 'right';
-  } else if (swipeDistanceX < -SWIPE_THRESHOLD) {
-    direction = 'left';
-  }
-}
-
-// Function to handle vertical swipe
-function handleVerticalSwipe(swipeDistanceY) {
-  if (swipeDistanceY > SWIPE_THRESHOLD) {
-    direction = 'down';
-  } else if (swipeDistanceY < -SWIPE_THRESHOLD) {
-    direction = 'up';
-  }
-}
-
-// Increase the game speed
 function increaseSpeed() {
   if (gameSpeedDelay > 25) {
     gameSpeedDelay -= gameSpeedDelay > 150 ? 5 : gameSpeedDelay > 100 ? 3 : gameSpeedDelay > 50 ? 2 : 1;
   }
 }
 
-// Check for collision with walls or itself
 function checkCollision() {
   const head = snake[0];
 
@@ -240,7 +156,6 @@ function checkCollision() {
   }
 }
 
-// Reset the game state
 function resetGame() {
   updateHighScore();
   stopGame();
@@ -251,21 +166,18 @@ function resetGame() {
   updateScore();
 }
 
-// Update the displayed score
 function updateScore() {
   const currentScore = snake.length - 1;
-  scoreElement.textContent = currentScore.toString().padStart(3, '0');
+  score.textContent = currentScore.toString().padStart(3, '0');
 }
 
-// Stop the game
 function stopGame() {
   clearInterval(gameInterval);
   gameStarted = false;
   instructionText.style.display = 'block';
-  link.style.display = 'flex';
+  extLink.style.display = 'block';
 }
 
-// Update the high score
 function updateHighScore() {
   const currentScore = snake.length - 1;
   if (currentScore > highScore) {
@@ -274,15 +186,3 @@ function updateHighScore() {
   }
   highScoreText.style.display = 'block';
 }
-
-// Function to get event coordinates (mouse or touch)
-function getEventCoordinates(event) {
-  if (event.touches && event.touches.length) {
-    return { x: event.touches[0].clientX, y: event.touches[0].clientY };
-  } else {
-    return { x: event.clientX, y: event.clientY };
-  }
-}
-
-// Event listeners
-document.addEventListener('keydown', handleKeyPress);
