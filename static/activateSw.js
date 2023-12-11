@@ -3,8 +3,12 @@ if ('serviceWorker' in navigator) {
     .then(function(registration) {
       console.log('Service Worker registered with scope:', registration.scope);
 
-      // Trigger the installation prompt from your application code
-      registration.active.postMessage({ action: 'installApp' });
+      // Wait for the service worker to be activated before triggering the prompt
+      if (registration.active) {
+        registration.active.postMessage({ action: 'installApp' });
+      } else {
+        console.error('Service Worker is not yet active.');
+      }
     })
     .catch(function(error) {
       console.error('Service Worker registration failed:', error);

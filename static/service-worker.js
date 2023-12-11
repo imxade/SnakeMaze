@@ -14,6 +14,10 @@ self.addEventListener('install', function(event) {
   );
 });
 
+self.addEventListener('activate', function(event) {
+  self.clients.claim(); // Take control of pages immediately
+});
+
 self.addEventListener('fetch', function(event) {
   self.clients.claim(); // Take control of pages immediately
   event.respondWith(
