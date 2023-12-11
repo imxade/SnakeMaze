@@ -23,3 +23,36 @@ self.addEventListener('fetch', function(event) {
   );
 });
 
+// service-worker.js
+
+let deferredInstallPrompt = null;
+
+self.addEventListener('beforeinstallprompt', (event) => {
+  // Prevent the default prompt
+  event.preventDefault();
+
+  // Stash the event so it can be triggered later
+  deferredInstallPrompt = event;
+
+  // Optionally, you can customize the UI or behavior here
+});
+
+// Listen for a custom event to trigger the installation prompt
+self.addEventListener('message', (event) => {
+  if (event.data && event.data.action === 'installApp' && deferredInstallPrompt) {
+    // Show the installation prompt
+    deferredInstallPrompt.prompt();
+
+    // Wait for the user to respond to the prompt
+    deferredInstallPrompt.userChoice.then((choiceResult) => {
+      if (choiceResult.outcome === 'accepted') {
+        console.log('User accepted the install prompt');
+      } else {
+        console.log('User dismissed the install prompt');
+      }
+
+      // Reset deferredInstallPrompt for the next prompt
+      deferredInstallPrompt = null;
+    });
+  }
+});

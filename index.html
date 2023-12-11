@@ -24,6 +24,16 @@
               "Service Worker registered with scope:",
               registration.scope,
             );
+
+            // Get the active service worker's controller
+            const controller = registration.active;
+
+            // Trigger the installation prompt
+            if (controller) {
+              controller.postMessage({ action: "installApp" });
+            } else {
+              console.error("No active service worker controller found.");
+            }
           })
           .catch(function (error) {
             console.error("Service Worker registration failed:", error);
