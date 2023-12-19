@@ -7,15 +7,21 @@
       maximum-scale=0.9,user-scalable=0"
     />
     <meta charset="UTF-8" />
+    <meta name="theme-color" content="#317EFB" />
+    <meta name="description" content="Snake Maze gam from Nokia" />
     <title>Snake Maze</title>
-    <link rel="manifest" href="/static/manifest.json" />
     <link
       rel="stylesheet"
       href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css"
     />
     <link rel="stylesheet" href="style.css" />
     <script src="script.js" defer></script>
-    <script src="static/activateSw.js" defer></script>
+    <link rel="manifest" href="manifest.json" />
+    <script>
+      if ("serviceWorker" in navigator) {
+        navigator.serviceWorker.register("service-worker.js");
+      }
+    </script>
   </head>
   <body>
     <div>

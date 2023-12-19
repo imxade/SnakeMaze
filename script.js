@@ -251,5 +251,3 @@ document.addEventListener("keydown", handleInput.bind(null, gameState));
 document.addEventListener("pointerdown", handleInput.bind(null, gameState));
 document.addEventListener("pointermove", handleInput.bind(null, gameState));
 document.addEventListener("pointerup", handleInput.bind(null, gameState));
-
-// Add any additional event listeners or initialization code as needed.
