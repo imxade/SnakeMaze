@@ -4,8 +4,8 @@
  "description": "Snake Maze game from black and green Nokia",
  "start_url": "/",
  "display": "standalone",
- "background_color": "#000",
- "theme_color": "#999",
+ "background_color": "#999",
+ "theme_color": "#000",
  "icons": [
  {
   "src": "/icon.png",
