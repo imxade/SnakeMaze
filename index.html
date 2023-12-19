@@ -8,7 +8,7 @@
     />
     <meta charset="UTF-8" />
     <meta name="theme-color" 
-      content="#grey" />
+      content="darkgrey" />
     <meta name="description" 
       content="Snake Maze game from black and green Nokia" />
     <title>Snake Maze</title>
@@ -18,12 +18,8 @@
     />
     <link rel="stylesheet" href="style.css" />
     <script src="script.js" defer></script>
-    <link rel="manifest" href="manifest.json" />
-    <script>
-      if ("serviceWorker" in navigator) {
-        navigator.serviceWorker.register("service-worker.js");
-      }
-    </script>
+    <link rel="manifest" href="/static/manifest.json" />
+    <script src="/static/sw.js"></script>
   </head>
   <body>
     <div>

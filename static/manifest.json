@@ -4,17 +4,17 @@
  "description": "Snake Maze game from black and green Nokia",
  "start_url": "/",
  "display": "standalone",
- "background_color": "black",
- "theme_color": "grey",
+ "background_color": "darkgrey",
+ "theme_color": "black",
  "icons": [
  {
-  "src": "/icon.png",
+  "src": "/static/icon.png",
   "sizes": "512x512",
   "type": "image/png",
   "purpose": "any"
  },
  {
-  "src": "/icon.png",
+  "src": "/static/icon.png",
   "sizes": "512x512",
   "type": "image/png",
   "purpose": "maskable"
