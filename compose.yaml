@@ -9,13 +9,9 @@ services:
      - 3000:80
    develop:
      watch:
-       - path: ./requirements.txt
-         action: rebuild
        - path: .
          target: /usr/share/nginx/html
-         action: sync
-   # environment:
-   #   - API_KEY=
+         action: sync+restart
 
 volumes:
  tasked:
